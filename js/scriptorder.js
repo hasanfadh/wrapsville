@@ -100,14 +100,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const label = e.target.closest(".delivery-option");
             deliveryFee = parseInt(label.dataset.fee || "0", 10);
 
-            const kelurahanGroup = document.getElementById("kelurahanGroup");
-            const kelurahanInput = document.getElementById("kelurahan");
-            if (e.target.value === "Deliv by Wraps") {
-                kelurahanGroup.style.display = "block";
+            // Alamat hanya bisa diisi kalau pesanan memang diantar.
+            // Ambil Sendiri (atau belum pilih opsi) = kolom alamat terkunci.
+            const alamatInput = document.getElementById("alamat");
+            if (e.target.value === "Ambil Sendiri") {
+                alamatInput.value = "";
+                alamatInput.disabled = true;
+                alamatInput.placeholder = "Tidak perlu alamat untuk Ambil Sendiri";
+                alamatInput.classList.remove("input-error");
             } else {
-                kelurahanGroup.style.display = "none";
-                kelurahanInput.value = "";
-                kelurahanInput.classList.remove("input-error");
+                alamatInput.disabled = false;
+                alamatInput.placeholder = "Masukan link maps alamat kamu";
             }
 
             updateSummary();
@@ -226,21 +229,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function prepareHiddenFields() {
+        const alamatEl = document.getElementById("alamat");
         document.getElementById("timestampInput").value    = new Date().toLocaleString("id-ID");
         document.getElementById("namaInput").value         = document.getElementById("nama").value;
         document.getElementById("whatsappInput").value     = document.getElementById("whatsapp").value;
-        document.getElementById("alamatInput").value       = document.getElementById("alamat").value;
+        document.getElementById("alamatInput").value       = alamatEl.disabled ? "-" : alamatEl.value;
         document.getElementById("catatanInput").value      = document.getElementById("catatan").value;
         document.getElementById("opsiPengirimanInput").value = getSelectedDelivery() || "";
-        document.getElementById("kelurahanInput").value    = document.getElementById("kelurahan").value;
     }
 
     function saveOrderToSession() {
+        const alamatSesi = document.getElementById("alamat");
         sessionStorage.setItem("wrapsvilleOrder", JSON.stringify({
             nama:              document.getElementById("nama").value,
             wa:                document.getElementById("whatsapp").value,
-            alamat:            document.getElementById("alamat").value,
-            kelurahan:         document.getElementById("kelurahan").value,
+            alamat:            alamatSesi.disabled ? "-" : alamatSesi.value,
             catatan:           document.getElementById("catatan").value,
             opsiPengiriman:    getSelectedDelivery(),
             deliveryFee:       deliveryFee,
@@ -281,6 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let hasMissing = false;
         requiredInputs.forEach(i => i.classList.remove("input-error"));
         requiredInputs.forEach(i => {
+            if (i.disabled) return; // kolom terkunci (mis. alamat saat Ambil Sendiri) tidak wajib
             const empty = (i.type === "file" && i.files.length === 0) || (i.type !== "file" && i.value.trim() === "");
             if (empty) { hasMissing = true; i.classList.add("input-error"); }
         });
@@ -295,20 +299,13 @@ document.addEventListener("DOMContentLoaded", () => {
             deliveryEl.classList.remove("delivery-error");
         }
 
-        const kelurahanInput = document.getElementById("kelurahan");
-        kelurahanInput.classList.remove("input-error");
-        if (selectedDelivery === "Deliv by Wraps" && !kelurahanInput.value.trim()) {
-            hasMissing = true;
-            kelurahanInput.classList.add("input-error");
-        }
-
         if (totalItemsCount <= 0) hasMissing = true;
 
         if (hasMissing) {
             // Kalau ada input teks kosong atau menu kosong, tampilkan statusMessage
             // Kalau hanya delivery yang kosong, sudah ada inline error + scroll, tidak perlu double pesan
             const onlyDeliveryMissing = !selectedDelivery &&
-                requiredInputs.every(i => (i.type === "file" ? i.files.length > 0 : i.value.trim() !== "")) &&
+                requiredInputs.every(i => i.disabled || (i.type === "file" ? i.files.length > 0 : i.value.trim() !== "")) &&
                 totalItemsCount > 0;
 
             if (!onlyDeliveryMissing) {

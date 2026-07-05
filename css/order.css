@@ -145,6 +145,14 @@ h2 {
     box-shadow: 0 0 0 2px rgba(217, 83, 79, 0.1);
 }
 
+/* Kolom terkunci (mis. alamat sebelum pilih opsi / saat Ambil Sendiri) */
+.form-group input:disabled {
+    background-color: #f4f4f4;
+    color: #999;
+    border-style: dashed;
+    cursor: not-allowed;
+}
+
 .form-group input[type="file"] {
     padding: 8px;
     font-size: 0.9rem;

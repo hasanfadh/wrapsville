@@ -60,14 +60,11 @@ function buatRekap() {
   var idx = buatIndexHeader_(headers);
 
   // Kolom opsional: hanya tampil kalau memang ada di data mentah
-  var adaKelurahan = idx["kelurahan"] !== undefined;
   var adaSauce = idx["additionalsauce"] !== undefined;
 
   var judul = ["Waktu Order", "Nama", "No. WhatsApp", "Pesanan"];
   if (adaSauce) judul.push("Additional Sauce");
-  judul.push("Total (pcs)", "Total Harga", "Pengiriman");
-  if (adaKelurahan) judul.push("Kelurahan");
-  judul.push("Alamat", "Catatan", "Bukti Transfer");
+  judul.push("Total (pcs)", "Total Harga", "Pengiriman", "Alamat", "Catatan", "Bukti Transfer");
 
   var barisRekap = [];
   for (var r = 1; r < data.length; r++) {
@@ -110,7 +107,6 @@ function buatRekap() {
     ];
     if (adaSauce) baris.push(sauce > 0 ? sauce : "");
     baris.push(total, harga, pengiriman);
-    if (adaKelurahan) baris.push(ambil_(row, idx, "kelurahan"));
     baris.push(
       ambil_(row, idx, "alamat"),
       ambil_(row, idx, "catatan"),
@@ -165,9 +161,7 @@ function buatRekap() {
   // Lebar kolom biar enak dilihat
   var lebar = [140, 140, 130, 240];
   if (adaSauce) lebar.push(130);
-  lebar.push(90, 110, 200);
-  if (adaKelurahan) lebar.push(120);
-  lebar.push(260, 180, 200);
+  lebar.push(90, 110, 200, 260, 180, 200);
   for (var c = 0; c < lebar.length; c++) rekap.setColumnWidth(c + 1, lebar[c]);
 }
 
