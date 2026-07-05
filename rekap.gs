@@ -116,8 +116,19 @@ function buatRekap() {
       ambil_(row, idx, "catatan"),
       ambil_(row, idx, "buktitransfer")
     );
-    barisRekap.push(baris);
+    barisRekap.push({
+      prioritas: prioritasPengiriman_(pengiriman),
+      urut: barisRekap.length, // jaga urutan waktu di dalam kelompok yang sama
+      data: baris
+    });
   }
+
+  // Urutkan: Ojek Online dulu, lalu Ambil Sendiri, lalu Deliv by Wraps.
+  // Pesanan baru masuk di ujung kelompoknya sendiri.
+  barisRekap.sort(function (a, b) {
+    return (a.prioritas - b.prioritas) || (a.urut - b.urut);
+  });
+  var nilaiRekap = barisRekap.map(function (x) { return x.data; });
 
   // Tulis ulang tab rekap dari nol biar selalu konsisten
   var rekap = ss.getSheetByName(REKAP_SHEET_NAME);
@@ -128,10 +139,10 @@ function buatRekap() {
   var nKol = judul.length;
   rekap.getRange(1, 1, 1, nKol).setValues([judul]);
 
-  if (barisRekap.length > 0) {
+  if (nilaiRekap.length > 0) {
     // Kolom WhatsApp diformat teks dulu supaya angka 0 di depan tidak hilang
-    rekap.getRange(2, 3, barisRekap.length, 1).setNumberFormat("@");
-    rekap.getRange(2, 1, barisRekap.length, nKol).setValues(barisRekap);
+    rekap.getRange(2, 3, nilaiRekap.length, 1).setNumberFormat("@");
+    rekap.getRange(2, 1, nilaiRekap.length, nKol).setValues(nilaiRekap);
   }
 
   // ===== Tata rias =====
@@ -143,12 +154,12 @@ function buatRekap() {
   rekap.setFrozenRows(1);
   rekap.setRowHeight(1, 34);
 
-  if (barisRekap.length > 0) {
-    var body = rekap.getRange(2, 1, barisRekap.length, nKol);
+  if (nilaiRekap.length > 0) {
+    var body = rekap.getRange(2, 1, nilaiRekap.length, nKol);
     body.setWrap(true).setVerticalAlignment("top");
     body.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY, false, false);
     // Waktu order tampil lengkap dengan jam, bukan tanggal saja
-    rekap.getRange(2, 1, barisRekap.length, 1).setNumberFormat("d/m/yyyy hh:mm");
+    rekap.getRange(2, 1, nilaiRekap.length, 1).setNumberFormat("d/m/yyyy hh:mm");
   }
 
   // Lebar kolom biar enak dilihat
@@ -199,6 +210,16 @@ function buatIndexHeader_(headers) {
 
 function normal_(s) {
   return String(s).toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+// Urutan tampil di rekap: 1) Ojek Online, 2) Ambil Sendiri,
+// 3) Deliv by Wraps (termasuk Free Ongkir), lainnya paling bawah
+function prioritasPengiriman_(pengiriman) {
+  var n = normal_(pengiriman);
+  if (n.indexOf("ojekonline") === 0) return 1;
+  if (n.indexOf("ambilsendiri") === 0) return 2;
+  if (n.indexOf("delivbywraps") === 0) return 3;
+  return 4;
 }
 
 function ambil_(row, idx, namaKolom) {
