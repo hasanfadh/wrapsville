@@ -18,21 +18,25 @@
 
 var REKAP_SHEET_NAME = "Rekap Pesanan";
 
-// Daftar kolom menu di sheet mentah -> label yang enak dibaca
+// Daftar kolom menu di sheet mentah -> label yang enak dibaca + harga satuan.
+// Kalau harga menu berubah, cukup ubah angka di sini.
 var MENU_COLS = [
-  ["Hot_Slaw_Ori",     "Hot Slaw Ori"],
-  ["Hot_Slaw_Lvl1",    "Hot Slaw Lv 1"],
-  ["Hot_Slaw_Lvl2",    "Hot Slaw Lv 2"],
-  ["Hot_Slaw_Lvl3",    "Hot Slaw Lv 3"],
-  ["Hot_Classic_Ori",  "Hot Classic Ori"],
-  ["Hot_Classic_Lvl1", "Hot Classic Lv 1"],
-  ["Hot_Classic_Lvl2", "Hot Classic Lv 2"],
-  ["Hot_Classic_Lvl3", "Hot Classic Lv 3"],
-  ["HotNFries_Ori",    "Hot N Fries Ori"],
-  ["HotNFries_Lvl1",   "Hot N Fries Lv 1"],
-  ["HotNFries_Lvl2",   "Hot N Fries Lv 2"],
-  ["HotNFries_Lvl3",   "Hot N Fries Lv 3"]
+  ["Hot_Slaw_Ori",     "Hot Slaw Ori",     25000],
+  ["Hot_Slaw_Lvl1",    "Hot Slaw Lv 1",    25000],
+  ["Hot_Slaw_Lvl2",    "Hot Slaw Lv 2",    25000],
+  ["Hot_Slaw_Lvl3",    "Hot Slaw Lv 3",    25000],
+  ["Hot_Classic_Ori",  "Hot Classic Ori",  30000],
+  ["Hot_Classic_Lvl1", "Hot Classic Lv 1", 30000],
+  ["Hot_Classic_Lvl2", "Hot Classic Lv 2", 30000],
+  ["Hot_Classic_Lvl3", "Hot Classic Lv 3", 30000],
+  ["HotNFries_Ori",    "Hot N Fries Ori",  30000],
+  ["HotNFries_Lvl1",   "Hot N Fries Lv 1", 30000],
+  ["HotNFries_Lvl2",   "Hot N Fries Lv 2", 30000],
+  ["HotNFries_Lvl3",   "Hot N Fries Lv 3", 30000]
 ];
+
+var HARGA_SAUCE  = 3000; // per pcs Additional Sauce
+var ONGKIR_DELIV = 4000; // hanya untuk opsi "Deliv by Wraps" biasa (bukan free ongkir)
 
 // Menu custom di bar atas spreadsheet
 function onOpen() {
@@ -74,20 +78,32 @@ function buatRekap() {
     // • Hot Classic Ori (1)
     var items = [];
     var totalHitung = 0;
+    var hargaHitung = 0;
     for (var m = 0; m < MENU_COLS.length; m++) {
       var jumlah = Number(ambil_(row, idx, MENU_COLS[m][0])) || 0;
       if (jumlah > 0) {
         items.push("• " + MENU_COLS[m][1] + " (" + jumlah + ")");
         totalHitung += jumlah;
+        hargaHitung += jumlah * MENU_COLS[m][2];
       }
     }
     if (adaSauce) {
       var sauce = Number(ambil_(row, idx, "additionalsauce")) || 0;
-      if (sauce > 0) items.push("• Extra Sauce (" + sauce + ")");
+      if (sauce > 0) {
+        items.push("• Additional Sauce (" + sauce + ")");
+        hargaHitung += sauce * HARGA_SAUCE;
+      }
     }
 
     var total = ambil_(row, idx, "totalpesanan");
     if (total === "" || total === undefined) total = totalHitung;
+
+    var pengiriman = ambil_(row, idx, "opsipengiriman");
+    if (normal_(pengiriman) === "delivbywraps") hargaHitung += ONGKIR_DELIV;
+
+    // Pakai harga dari data mentah kalau ada; kalau kosong, hitung sendiri
+    var harga = ambilPertama_(row, idx, ["totalharga", "harga", "totalbayar", "hargatotal"]);
+    if (harga === "" || harga === undefined) harga = formatRupiah_(hargaHitung);
 
     var baris = [
       ambil_(row, idx, "timestamp"),
@@ -95,8 +111,8 @@ function buatRekap() {
       rapikanNomorWA_(ambil_(row, idx, "notelp")),
       items.join("\n"),
       total,
-      ambil_(row, idx, "totalharga"),
-      ambil_(row, idx, "opsipengiriman")
+      harga,
+      pengiriman
     ];
     if (adaKelurahan) baris.push(ambil_(row, idx, "kelurahan"));
     baris.push(
@@ -135,6 +151,8 @@ function buatRekap() {
     var body = rekap.getRange(2, 1, barisRekap.length, nKol);
     body.setWrap(true).setVerticalAlignment("top");
     body.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY, false, false);
+    // Waktu order tampil lengkap dengan jam, bukan tanggal saja
+    rekap.getRange(2, 1, barisRekap.length, 1).setNumberFormat("d/m/yyyy hh:mm");
   }
 
   // Lebar kolom biar enak dilihat
@@ -188,6 +206,21 @@ function normal_(s) {
 function ambil_(row, idx, namaKolom) {
   var i = idx[normal_(namaKolom)];
   return (i === undefined) ? "" : row[i];
+}
+
+// Coba beberapa kemungkinan nama kolom, pakai yang pertama ada isinya
+function ambilPertama_(row, idx, kandidat) {
+  for (var i = 0; i < kandidat.length; i++) {
+    var v = ambil_(row, idx, kandidat[i]);
+    if (v !== "" && v !== undefined) return v;
+  }
+  return "";
+}
+
+// 59000 -> "Rp 59.000"
+function formatRupiah_(n) {
+  if (!n) return "Rp 0";
+  return "Rp " + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
 // 81234... / 6281234... -> 081234...
