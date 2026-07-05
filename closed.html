@@ -4,88 +4,155 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pesanan Ditutup - Wrapsville</title>
+  <meta name="description" content="Stok Wrapsville hari ini sudah habis. Pantau Instagram @wrapsville untuk info pembukaan order berikutnya.">
+  <link rel="icon" type="image/png" href="images/logowrapsville.png">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    .closed-section {
-      max-width: 500px;
-      margin: 60px auto;
-      padding: 0 20px 80px;
+    .closed-hero {
+      position: relative;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+    }
+
+    .closed-card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 560px;
       text-align: center;
-      color: #fff;
+      padding: 52px 32px 46px;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255,205,15,0.14), transparent 45%),
+        radial-gradient(circle at 85% 90%, rgba(0,0,0,0.22), transparent 50%),
+        var(--red-dark);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 28px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      animation: closedIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
     }
 
-    .closed-icon {
-      font-size: 4rem;
+    @keyframes closedIn {
+      from { transform: translateY(24px) scale(0.96); opacity: 0; }
+      to   { transform: translateY(0) scale(1);       opacity: 1; }
+    }
+
+    .closed-stamp {
+      display: inline-block;
+      font-weight: 900;
+      font-size: 1.05rem;
+      letter-spacing: 4px;
+      color: var(--yellow);
+      border: 2.5px dashed var(--yellow);
+      border-radius: 12px;
+      padding: 10px 26px;
+      transform: rotate(-5deg);
+      margin-bottom: 26px;
+      animation: stampIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.35s both;
+    }
+
+    @keyframes stampIn {
+      from { transform: rotate(-5deg) scale(1.6); opacity: 0; }
+      to   { transform: rotate(-5deg) scale(1);   opacity: 1; }
+    }
+
+    .closed-logo {
+      width: 84px;
+      height: auto;
       display: block;
-      margin-bottom: 20px;
-      animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      margin: 0 auto 18px;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,0.3));
+      animation: closedFloat 4s ease-in-out infinite;
     }
 
-    @keyframes bounceIn {
-      from { transform: scale(0.5); opacity: 0; }
-      to   { transform: scale(1);   opacity: 1; }
+    @keyframes closedFloat {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
     }
 
-    .closed-section h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      line-height: 1.4;
-      margin-bottom: 16px;
+    .closed-card h1 {
+      font-family: 'beautifreak', 'Poppins', sans-serif;
+      font-size: clamp(2.1rem, 6vw, 2.9rem);
+      font-weight: 400;
+      line-height: 1.12;
+      margin-bottom: 18px;
     }
 
-    .closed-section .subtitle {
-      font-size: 1rem;
-      line-height: 1.8;
-      opacity: 0.92;
-      margin-bottom: 32px;
+    .closed-card h1 span {
+      color: var(--yellow);
     }
 
-    .sold-out-badge {
-      display: inline-block;
-      background: rgba(255,255,255,0.15);
-      border: 2px solid rgba(255,255,255,0.4);
-      border-radius: 50px;
-      padding: 8px 24px;
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      margin-bottom: 32px;
+    .closed-card .subtitle {
+      font-size: 0.95rem;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.9);
+      max-width: 380px;
+      margin: 0 auto 12px;
     }
 
-    .btn-home {
-      display: inline-block;
-      padding: 14px 36px;
-      background-color: #fff;
-      color: #ed0100;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 1rem;
-      border-radius: 10px;
-      transition: background-color 0.2s, color 0.2s;
+    .closed-card .subtitle strong {
+      color: var(--yellow);
     }
 
-    .btn-home:hover {
-      background-color: #c00;
-      color: #fff;
+    .closed-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin-top: 30px;
     }
 
-    .btn-retry {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 10px 28px;
-      background: transparent;
-      color: #fff;
-      text-decoration: none;
+    .closed-ig-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding-left: 24px;
+      padding-right: 24px;
+      white-space: nowrap;
+    }
+
+    .closed-ig-btn img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .closed-retry {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.82rem;
       font-weight: 600;
-      font-size: 0.9rem;
-      border-radius: 10px;
-      border: 2px solid rgba(255,255,255,0.5);
-      transition: border-color 0.2s, background 0.2s;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      transition: color 0.2s;
     }
 
-    .btn-retry:hover {
-      background: rgba(255,255,255,0.15);
-      border-color: #fff;
+    .closed-retry:hover {
+      color: #fff;
+    }
+
+    @media (max-width: 640px) {
+      .closed-hero {
+        padding: 28px 16px 60px;
+      }
+
+      .closed-card {
+        padding: 42px 22px 38px;
+      }
+
+      .closed-actions .btn-order {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .closed-actions .btn-ghost {
+        width: 100%;
+        max-width: 300px;
+        text-align: center;
+      }
     }
   </style>
 </head>
@@ -95,10 +162,11 @@
     <div class="container">
       <div class="logo-wrapper">
         <img src="images/logowrapsville.png" alt="Wrapsville Logo" class="logo">
-        <img src="images/text-wrapsville.png" alt="Wrapsville Text" class="logo-text">
+        <span class="logo-wordmark">Wraps<span>ville</span></span>
       </div>
       <nav>
         <ul>
+          <li><a href="about.html" class="navbar-link">About</a></li>
           <li>
             <a href="order.html" class="navbar-cart-btn" title="Order">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -113,30 +181,41 @@
   </header>
 
   <main>
-    <section class="closed-section">
+    <section class="closed-hero">
 
-      <div class="sold-out-badge">SOLD OUT</div>
+      <div class="closed-card">
+        <div class="closed-stamp">SOLD OUT</div>
 
-      <h1>Stok hari ini<br>sudah habis!</h1>
+        <img src="images/logowrapsville.png" alt="Wrapsville" class="closed-logo">
 
-      <p class="subtitle">
-        Makasih buat semua yang udah order hari ini<br>
-        Pantau Instagram kami untuk info<br>
-        pembukaan order berikutnya.
-      </p>
+        <h1>Stok Hari Ini<br><span>Sudah Habis!</span></h1>
 
-      <p class="subtitle">
-        Update pesanan via Instagram <strong>@wrapsville</strong> 🤍
-      </p>
+        <p class="subtitle">
+          Makasih banyak buat semua yang udah order hari ini, Wrapsgang! 🤍
+          Kalian luar biasa.
+        </p>
 
-      <a href="index.html" class="btn-home">Kembali ke Beranda</a>
-      <br>
-      <a href="order.html" class="btn-retry">Coba Akses Halaman Order</a>
+        <p class="subtitle">
+          Pantau Instagram <strong>@wrapsville</strong> untuk info
+          pembukaan order berikutnya.
+        </p>
+
+        <div class="closed-actions">
+          <a href="https://www.instagram.com/wrapsville" target="_blank" class="btn-order closed-ig-btn">
+            <img src="images/instagram.png" alt="">
+            FOLLOW @WRAPSVILLE
+          </a>
+          <a href="index.html" class="btn-ghost">← Kembali ke Beranda</a>
+          <a href="order.html" class="closed-retry">Coba akses halaman order lagi</a>
+        </div>
+      </div>
 
     </section>
   </main>
 
   <footer>
+    <img src="images/logowrapsville.png" alt="Wrapsville" class="footer-logo">
+    <p class="footer-tagline">Wrap ur hunger, Burn ur taste.</p>
     <section class="contact">
       <a href="https://www.instagram.com/wrapsville" target="_blank">
         <img src="images/instagram.png" alt="Instagram" class="social-icon">
@@ -145,6 +224,7 @@
         <img src="images/whatsapp.png" alt="WhatsApp" class="social-icon">
       </a>
     </section>
+    <p class="footer-copy">© 2026 Wrapsville · Nashville Chicken Wraps</p>
   </footer>
 
 </body>

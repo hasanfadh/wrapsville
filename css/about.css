@@ -1,27 +1,39 @@
-/* ===== Back Button ===== */
+/* ============================================
+   ABOUT US — Wrapsville
+   ============================================ */
+
+/* ===== Top bar / Back button ===== */
+.au-topbar {
+  max-width: 908px;
+  margin: 18px auto 0;
+  padding: 0 24px;
+}
+
 .au-back-btn {
-  display: inline-block;
-  margin: 16px 0 0 24px;
-  padding: 7px 16px;
-  color: rgba(255,255,255,0.8);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  color: rgba(255,255,255,0.85);
   text-decoration: none;
   font-size: 0.82rem;
   font-weight: 600;
-  border: 1.5px solid rgba(255,255,255,0.35);
-  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 50px;
   transition: color 0.2s, border-color 0.2s, background 0.2s;
 }
 
 .au-back-btn:hover {
   color: #fff;
   border-color: #fff;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.18);
 }
 
 /* ===== Base ===== */
 .au-section {
-  padding: 56px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 60px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .au-section:last-of-type {
@@ -33,65 +45,70 @@
   margin: 0 auto;
 }
 
+.au-center {
+  text-align: center;
+}
+
 /* Badge */
 .au-badge {
   display: inline-block;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.14);
   border: 1.5px solid rgba(255, 255, 255, 0.4);
   border-radius: 50px;
-  padding: 4px 16px;
+  padding: 6px 16px;
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 2.5px;
+  letter-spacing: 3px;
   color: #fff;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
-/* Title */
+/* Title — pakai font display brand */
 .au-title {
-  font-size: 2rem;
-  font-weight: 700;
+  font-family: 'beautifreak', 'Poppins', sans-serif;
+  font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+  font-weight: 400;
   color: #fff;
-  line-height: 1.25;
+  line-height: 1.12;
   margin-bottom: 18px;
+}
+
+.au-title span {
+  color: var(--yellow);
 }
 
 /* Tagline */
 .au-tagline {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 1.5px;
-  color: rgba(255,255,255,0.65);
+  letter-spacing: 2px;
+  color: var(--yellow);
   text-transform: uppercase;
-  margin-bottom: 22px;
+  margin-bottom: 30px;
+}
+
+@keyframes auFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
 }
 
 /* Body text */
 .au-body {
-  font-size: 1rem;
-  line-height: 1.85;
-  color: rgba(255, 255, 255, 0.88);
-  margin-bottom: 14px;
-  text-align: justify;
+  font-size: 0.98rem;
+  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 auto 16px;
+  max-width: 680px;
+}
+
+.au-body strong {
+  color: #fff;
 }
 
 .au-closing-line {
   font-weight: 700;
-  color: #fff;
-}
-
-/* ===== WHO WE ARE — Hero Logo ===== */
-.au-hero-logo-wrap {
-  text-align: center;
-  margin-bottom: 28px;
-}
-
-.au-hero-logo {
-  width: 90px;
-  height: auto;
-  display: inline-block;
-  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2));
-  animation: floatSlow 4s ease-in-out infinite;
+  color: var(--yellow);
+  font-size: 1.02rem;
 }
 
 /* Pills */
@@ -99,39 +116,92 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 24px;
+  margin-top: 26px;
+}
+
+.au-who .au-pills {
+  justify-content: center;
 }
 
 .au-pill {
   background: rgba(255,255,255,0.12);
   border: 1.5px solid rgba(255,255,255,0.3);
   border-radius: 50px;
-  padding: 6px 16px;
+  padding: 7px 17px;
   font-size: 0.82rem;
   font-weight: 600;
   color: #fff;
+  transition: border-color 0.2s, transform 0.2s;
 }
 
-/* ===== Moments Gallery ===== */
+.au-pill:hover {
+  border-color: var(--yellow);
+  transform: translateY(-2px);
+}
+
+/* ===== OUR STORY ===== */
+
+/* Paragraf story rata kiri, sejajar dengan badge, judul, dan timeline */
+.au-founded .au-body {
+  margin-left: 0;
+  margin-right: 0;
+  max-width: 720px;
+}
+
+.au-year {
+  font-family: 'beautifreak', 'Poppins', sans-serif;
+  font-size: clamp(3.4rem, 8vw, 4.8rem);
+  color: var(--yellow);
+  display: block;
+  line-height: 1;
+  margin-top: 6px;
+  text-shadow: 0 6px 22px rgba(0,0,0,0.3);
+}
+
+.au-quote {
+  position: relative;
+  border-left: 3px solid var(--yellow);
+  padding: 16px 20px 16px 24px;
+  margin: 22px 0;
+  font-style: italic;
+  font-size: 1rem;
+  color: rgba(255,255,255,0.95);
+  line-height: 1.75;
+  background: rgba(255,255,255,0.08);
+  border-radius: 0 14px 14px 0;
+  max-width: 680px;
+}
+
+.au-quote::before {
+  content: '"';
+  font-family: 'beautifreak', Georgia, serif;
+  font-size: 2.6rem;
+  color: var(--yellow);
+  position: absolute;
+  top: -6px;
+  left: 10px;
+  opacity: 0.5;
+}
+
+/* Moments — gaya polaroid */
 .au-moments-wrap {
-  margin: 24px 0;
+  margin: 30px 0;
 }
 
 .au-moments-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  color: rgba(255,255,255,0.6);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.65);
   text-transform: uppercase;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .au-moments {
   display: flex;
-  flex-direction: row;
-  gap: 14px;
+  gap: 18px;
   overflow-x: auto;
-  padding-bottom: 10px;
+  padding: 10px 4px 16px;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x mandatory;
 }
@@ -153,185 +223,230 @@
 .au-moment-item {
   flex: 0 0 auto;
   scroll-snap-align: start;
-  width: 180px;
-  height: 180px;
-  border-radius: 18px;
-  overflow: hidden;
-  background: rgba(255,255,255,0.1);
-  border: 1.5px solid rgba(255,255,255,0.2);
-  transition: transform 0.2s;
+  width: 190px;
+  background: #fff;
+  padding: 8px 8px 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.28);
+  transform: rotate(-1.6deg);
+  transition: transform 0.25s ease;
+}
+
+.au-moment-item:nth-child(even) {
+  transform: rotate(1.6deg);
 }
 
 .au-moment-item:hover {
-  transform: scale(1.03);
+  transform: rotate(0deg) scale(1.04);
 }
 
 .au-moment-item img {
   width: 100%;
-  height: 100%;
+  height: 172px;
   object-fit: cover;
+  border-radius: 7px;
   display: block;
 }
 
-
-.au-moment-item {
-  position: relative;
-}
-
-/* ===== OUR STORY ===== */
-.au-founded-grid {
-  display: block;
-}
-
-.au-founded-top {
-  margin-bottom: 4px;
-}
-
-.au-year {
-  font-size: 4rem;
-  font-weight: 900;
-  color: #fff;
-  display: block;
-  line-height: 1;
-  margin-top: 4px;
-}
-
-.au-quote {
-  border-left: 3px solid rgba(255,255,255,0.45);
-  padding: 12px 18px;
-  margin: 18px 0;
-  font-style: italic;
-  font-size: 0.97rem;
-  color: rgba(255,255,255,0.9);
-  line-height: 1.7;
-  background: rgba(255,255,255,0.07);
-  border-radius: 0 10px 10px 0;
-}
-
+/* Milestones — timeline vertikal */
 .au-milestones {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin: 18px 0 20px;
+  gap: 18px;
+  margin: 24px 0 26px;
+  padding-left: 6px;
+}
+
+.au-milestones::before {
+  content: '';
+  position: absolute;
+  left: 10.5px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: rgba(255,255,255,0.25);
 }
 
 .au-milestone {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   font-size: 0.95rem;
-  color: rgba(255,255,255,0.88);
+  font-weight: 500;
+  color: rgba(255,255,255,0.92);
 }
 
 .au-milestone-dot {
-  width: 9px;
-  height: 9px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--yellow);
+  box-shadow: 0 0 0 4px rgba(255,205,15,0.22);
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
-/* Desktop: kanan column */
-.au-founded-img-desktop {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: sticky;
-  top: 100px;
-}
-
-/* Mobile inline: hidden di desktop */
-.au-founded-img-mobile {
-  display: none;
-}
-
-.au-story-img {
-  width: 100%;
-  max-width: 240px;
-  display: block;
-  margin: 0 auto;
-  filter: drop-shadow(0 12px 28px rgba(0,0,0,0.2));
-  animation: floatSlow 4s ease-in-out infinite;
-}
-
-@keyframes floatSlow {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-14px); }
-}
-
-/* ===== Vision & Mission ===== */
-.au-vismis-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 12px;
-}
-
-.au-vismis-card {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  padding: 26px 22px;
-}
-
-.au-vismis-icon {
-  font-size: 1.8rem;
-  display: block;
-  margin-bottom: 10px;
-}
-
-.au-vismis-card h3 {
-  font-size: 1.1rem;
+/* ===== Vision & Mission — gaya editorial ===== */
+.au-vm-label {
+  font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin: 36px 0 16px;
+}
+
+.au-vision {
+  text-align: center;
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  font-weight: 600;
+  line-height: 1.75;
   color: #fff;
-  margin-bottom: 10px;
+  max-width: 640px;
+  margin: 0 auto 10px;
 }
 
-.au-vismis-card p,
-.au-vismis-card li {
-  font-size: 0.9rem;
-  line-height: 1.8;
-  color: rgba(255, 255, 255, 0.85);
+.au-hl {
+  color: var(--yellow);
+  border-bottom: 3px solid rgba(255,205,15,0.5);
+  white-space: nowrap;
 }
 
-.au-vismis-card ul {
-  padding-left: 16px;
+.au-missions {
+  max-width: 640px;
+  margin: 0 auto;
+  border-top: 1px solid rgba(255,255,255,0.16);
+}
+
+.au-mission {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: flex-start;
+  gap: 22px;
+  padding: 18px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.16);
 }
 
-/* ===== Wrapsgang ===== */
-.au-wg-def {
-  background: rgba(255,255,255,0.1);
-  border: 1.5px solid rgba(255,255,255,0.2);
-  border-radius: 16px;
-  padding: 26px 24px;
-  margin-top: 12px;
+.au-mission-num {
+  font-family: 'beautifreak', 'Poppins', sans-serif;
+  font-size: 1.7rem;
+  color: var(--yellow);
+  line-height: 1.15;
+  flex: 0 0 46px;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.au-mission p {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.9);
+  margin: 0;
+  padding-top: 3px;
+}
+
+/* ===== Wrapsgang — kartu kamus gaya kertas ===== */
+.au-wg-card {
+  position: relative;
+  background: var(--cream, #fff6e8);
+  color: #52362a;
+  border-radius: 18px;
+  padding: 32px 30px;
+  margin: 18px auto 0;
+  max-width: 640px;
+  box-shadow: 0 18px 44px rgba(0,0,0,0.28);
+}
+
+.au-wg-card::after {
+  content: '🌯';
+  position: absolute;
+  top: -16px;
+  right: 24px;
+  font-size: 2rem;
+  transform: rotate(14deg);
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));
 }
 
 .au-wg-word {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 14px;
-  line-height: 1.5;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #b30100;
+  line-height: 1.3;
 }
 
 .au-wg-word em {
   font-size: 0.85rem;
-  font-weight: 400;
-  opacity: 0.65;
+  font-weight: 500;
+  font-style: italic;
+  color: #a08976;
 }
 
-/* ===== Testimonial Screenshot Gallery ===== */
-.au-testi-hint {
-  font-size: 0.78rem;
-  font-weight: 600;
+.au-wg-pron {
+  font-size: 0.88rem;
+  color: #a08976;
   letter-spacing: 1px;
-  color: rgba(255,255,255,0.5);
-  text-transform: uppercase;
+  padding-bottom: 14px;
   margin-bottom: 16px;
+  border-bottom: 1.5px dashed #e3d2bd;
+}
+
+.au-wg-defs {
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.au-wg-defs li {
+  font-size: 0.93rem;
+  line-height: 1.8;
+  color: #5d4a3d;
+  padding-left: 4px;
+}
+
+.au-wg-defs li::marker {
+  color: #b30100;
+  font-weight: 700;
+}
+
+.au-wg-also {
+  font-size: 0.85rem;
+  color: #7c6350;
+  padding-top: 14px;
+  border-top: 1.5px dashed #e3d2bd;
+}
+
+.au-wg-also strong {
+  color: #b30100;
+}
+
+.au-wg-note {
+  font-size: 0.85rem;
+  color: #8a6f5c;
+  margin-top: 10px;
+}
+
+/* ===== Testimonial Gallery ===== */
+.au-testi-hint {
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.au-testi-hint::after {
+  content: '→';
+  display: inline-block;
+  margin-left: 8px;
+  animation: auHintSlide 1.3s ease-in-out infinite;
+}
+
+@keyframes auHintSlide {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(6px); }
 }
 
 .au-testi-scroll {
@@ -342,7 +457,7 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x mandatory;
-  padding-bottom: 12px;
+  padding: 4px 4px 14px;
   cursor: grab;
 }
 
@@ -366,17 +481,17 @@
 
 .au-testi-img {
   scroll-snap-align: start;
-  width: 160px;
+  width: 165px;
   flex-shrink: 0;
   border-radius: 16px;
   overflow: hidden;
   background: rgba(255,255,255,0.12);
-  border: 2px solid rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.22);
   box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  /* pop-up animation initial state */
+  /* initial state untuk pop-up animation */
   opacity: 0;
   transform: translateY(24px) scale(0.95);
-  transition: opacity 0.45s ease, transform 0.45s ease, box-shadow 0.2s;
+  transition: opacity 0.45s ease, transform 0.45s ease, box-shadow 0.2s, border-color 0.2s;
 }
 
 .au-testi-img.testi-pop-visible {
@@ -386,6 +501,7 @@
 
 .au-testi-img:hover {
   box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+  border-color: rgba(255,205,15,0.6);
   transform: translateY(-3px) scale(1.02);
 }
 
@@ -396,110 +512,87 @@
   border-radius: 14px;
 }
 
-/* Placeholder ketika foto belum ada */
-.au-testi-img img[src$="testi1.jpg"],
-.au-testi-img img[src$="testi2.jpg"],
-.au-testi-img img[src$="testi3.jpg"],
-.au-testi-img img[src$="testi4.jpg"],
-.au-testi-img img[src$="testi5.jpg"],
-.au-testi-img img[src$="testi6.jpg"],
-.au-testi-img img[src$="testi7.jpg"],
-.au-testi-img img[src$="testi8.jpg"],
-.au-testi-img img[src$="testi9.jpg"],
-.au-testi-img img[src$="testi10.jpg"] {
-  min-height: 200px;
-  background: rgba(255,255,255,0.08);
-}
-
 /* ===== CTA Ending ===== */
 .au-cta {
   border-bottom: none;
 }
 
-.au-cta-inner {
+.au-cta-card {
   text-align: center;
+  padding: 54px 30px;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255,205,15,0.16), transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(0,0,0,0.22), transparent 50%),
+    var(--red-dark, #c40100);
+  border-radius: 26px;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.25);
 }
 
-.au-cta-inner .au-title {
-  font-size: 2rem;
+.au-cta-card .au-body {
+  max-width: 560px;
+  margin: 0 auto 12px;
 }
 
-.au-cta-inner .au-body {
-  max-width: 540px;
-  margin: 0 auto 14px;
+.au-cta-tag {
+  color: rgba(255,255,255,0.85);
+}
+
+.au-cta-logo {
+  width: 68px;
+  height: auto;
+  display: inline-block;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 10px 22px rgba(0,0,0,0.25));
+  animation: auFloat 4s ease-in-out infinite;
 }
 
 .au-cta-btn {
-  display: inline-block;
-  margin-top: 24px;
-  padding: 14px 44px;
-  background: #fff;
-  color: #ed0100;
-  font-weight: 700;
-  font-size: 0.88rem;
-  letter-spacing: 2px;
-  border-radius: 10px;
-  text-decoration: none;
-  border: 2px solid transparent;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  margin-top: 22px;
 }
 
-.au-cta-btn:hover {
-  background: transparent;
-  color: #fff;
-  border-color: #fff;
-}
+/* ===== MOBILE ===== */
+@media (max-width: 640px) {
 
-/* ===== MOBILE (≤ 768px) ===== */
-@media (max-width: 768px) {
+  .au-topbar {
+    margin-top: 14px;
+    padding: 0 18px;
+  }
 
   .au-section {
-    padding: 44px 20px;
+    padding: 46px 18px;
   }
 
   .au-title {
-    font-size: 1.55rem;
+    font-size: 1.75rem;
   }
 
-  .au-year {
-    font-size: 3rem;
+  .au-tagline {
+    font-size: 0.72rem;
+    margin-bottom: 24px;
   }
 
   .au-body {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
+    line-height: 1.85;
   }
 
-  .au-hero-logo {
-    width: 80px;
+  .au-year {
+    font-size: 3.2rem;
   }
 
-  /* OUR STORY: 1 kolom, gambar muncul inline */
-  .au-founded-grid {
-    grid-template-columns: 1fr;
-    gap: 0;
+  .au-quote {
+    font-size: 0.93rem;
+    padding: 14px 16px 14px 22px;
   }
 
-  .au-founded-img-desktop {
-    display: none;
+  .au-moment-item {
+    width: 158px;
+    padding: 7px 7px 20px;
   }
 
-  .au-founded-img-mobile {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0 24px;
-  }
-
-  .au-founded-img-mobile .au-story-img {
-    max-width: 130px;
-  }
-
-  /* Vismis: 1 kolom */
-  .au-vismis-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .au-cta-inner .au-title {
-    font-size: 1.55rem;
+  .au-moment-item img {
+    height: 144px;
   }
 
   .au-pills {
@@ -508,10 +601,50 @@
 
   .au-pill {
     font-size: 0.78rem;
-    padding: 5px 13px;
+    padding: 6px 14px;
   }
 
-  .au-wg-def {
-    padding: 20px 18px;
+  .au-vision {
+    font-size: 1.05rem;
+  }
+
+  .au-mission {
+    gap: 16px;
+    padding: 15px 2px;
+  }
+
+  .au-mission-num {
+    font-size: 1.45rem;
+    flex: 0 0 38px;
+  }
+
+  .au-mission p {
+    font-size: 0.9rem;
+  }
+
+  .au-cta-logo {
+    width: 58px;
+  }
+
+  .au-wg-card {
+    padding: 26px 22px;
+  }
+
+  .au-wg-word {
+    font-size: 1.25rem;
+  }
+
+  .au-testi-img {
+    width: 142px;
+  }
+
+  .au-cta-card {
+    padding: 42px 22px;
+  }
+
+  .au-cta-card .btn-order {
+    width: 100%;
+    max-width: 300px;
+    padding: 15px 40px;
   }
 }

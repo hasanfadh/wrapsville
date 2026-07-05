@@ -1,13 +1,13 @@
-const aboutSection = document.querySelector('.about');
-const wrapImages = document.querySelectorAll('.wrap-image');
+// Reveal sections saat di-scroll
+const revealEls = document.querySelectorAll('.reveal');
 
-const observer = new IntersectionObserver((entries) => {
+const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
-      wrapImages.forEach((img) => img.classList.add('show'));
+      entry.target.classList.add('show');
+      revealObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.3 });
+}, { threshold: 0.15 });
 
-observer.observe(aboutSection);
-
+revealEls.forEach((el) => revealObserver.observe(el));

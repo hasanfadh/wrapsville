@@ -64,16 +64,31 @@ body {
     height: auto;
 }
 
-/* Tulisan wrapsville sebagai gambar */
-.navbar-title-logo {
-    width: 140px; /* diperbesar */
-    height: auto;
+/* Wordmark "Wrapsville" sebagai teks asli (bukan gambar) supaya selalu tajam */
+.logo-wordmark {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    line-height: 1.25;
+    letter-spacing: 0.3px;
+    color: #fff;
+    background: #ed0100;
+    padding: 1px 12px 3px;
+    border-radius: 7px;
+    display: inline-block;
+    transform: rotate(-2deg);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    user-select: none;
+}
+
+.logo-wordmark span {
+    color: #ffcd0f;
 }
 
 /* Responsive mobile */
 @media (max-width: 480px) {
     .navbar-logo { width: 40px; }
-    .navbar-title-logo { width: 100px; }
+    .logo-wordmark { font-size: 1.15rem; }
 
     .navbar-back { font-size: 2rem; }
 
