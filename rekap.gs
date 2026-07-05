@@ -63,7 +63,9 @@ function buatRekap() {
   var adaKelurahan = idx["kelurahan"] !== undefined;
   var adaSauce = idx["additionalsauce"] !== undefined;
 
-  var judul = ["Waktu Order", "Nama", "No. WhatsApp", "Pesanan", "Total (pcs)", "Total Harga", "Pengiriman"];
+  var judul = ["Waktu Order", "Nama", "No. WhatsApp", "Pesanan"];
+  if (adaSauce) judul.push("Additional Sauce");
+  judul.push("Total (pcs)", "Total Harga", "Pengiriman");
   if (adaKelurahan) judul.push("Kelurahan");
   judul.push("Alamat", "Catatan", "Bukti Transfer");
 
@@ -87,13 +89,8 @@ function buatRekap() {
         hargaHitung += jumlah * MENU_COLS[m][2];
       }
     }
-    if (adaSauce) {
-      var sauce = Number(ambil_(row, idx, "additionalsauce")) || 0;
-      if (sauce > 0) {
-        items.push("• Additional Sauce (" + sauce + ")");
-        hargaHitung += sauce * HARGA_SAUCE;
-      }
-    }
+    var sauce = adaSauce ? (Number(ambil_(row, idx, "additionalsauce")) || 0) : 0;
+    hargaHitung += sauce * HARGA_SAUCE;
 
     var total = ambil_(row, idx, "totalpesanan");
     if (total === "" || total === undefined) total = totalHitung;
@@ -109,11 +106,10 @@ function buatRekap() {
       ambil_(row, idx, "timestamp"),
       nama,
       rapikanNomorWA_(ambil_(row, idx, "notelp")),
-      items.join("\n"),
-      total,
-      harga,
-      pengiriman
+      items.join("\n")
     ];
+    if (adaSauce) baris.push(sauce > 0 ? sauce : "");
+    baris.push(total, harga, pengiriman);
     if (adaKelurahan) baris.push(ambil_(row, idx, "kelurahan"));
     baris.push(
       ambil_(row, idx, "alamat"),
@@ -156,7 +152,9 @@ function buatRekap() {
   }
 
   // Lebar kolom biar enak dilihat
-  var lebar = [140, 140, 130, 240, 90, 110, 200];
+  var lebar = [140, 140, 130, 240];
+  if (adaSauce) lebar.push(130);
+  lebar.push(90, 110, 200);
   if (adaKelurahan) lebar.push(120);
   lebar.push(260, 180, 200);
   for (var c = 0; c < lebar.length; c++) rekap.setColumnWidth(c + 1, lebar[c]);
