@@ -21,7 +21,8 @@ function doPost(e) {
       return (params[key] && params[key][0] !== undefined) ? params[key][0] : (def !== undefined ? def : "");
     }
 
-    var timestamp      = get("timestamp") || new Date().toLocaleString('id-ID');
+    // Timestamp dibuat di server (bukan pakai kiriman client) biar format selalu konsisten
+    var timestamp      = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss");
     var nama           = get("nama");
     var whatsapp       = get("whatsapp");
     var alamat         = get("alamat");
@@ -29,16 +30,21 @@ function doPost(e) {
     var opsiPengiriman = get("opsiPengiriman");
     var totalPesanan   = get("totalPesanan");
     var totalHarga     = get("totalHarga");
+    var sauceQty       = get("additionalSauceQty", "0");
 
     // Menu — default 0 jika tidak dikirim
-    var hotSlawOri     = get("hotSlawOri",     "0");
-    var hotSlawLvl1    = get("hotSlawLvl1",    "0");
-    var hotSlawLvl2    = get("hotSlawLvl2",    "0");
-    var hotSlawLvl3    = get("hotSlawLvl3",    "0");
-    var hotClassicOri  = get("hotClassicOri",  "0");
-    var hotClassicLvl1 = get("hotClassicLvl1", "0");
-    var hotClassicLvl2 = get("hotClassicLvl2", "0");
-    var hotClassicLvl3 = get("hotClassicLvl3", "0");
+    var hotSlawOri      = get("hotSlawOri",     "0");
+    var hotSlawLvl1     = get("hotSlawLvl1",    "0");
+    var hotSlawLvl2     = get("hotSlawLvl2",    "0");
+    var hotSlawLvl3     = get("hotSlawLvl3",    "0");
+    var hotClassicOri   = get("hotClassicOri",  "0");
+    var hotClassicLvl1  = get("hotClassicLvl1", "0");
+    var hotClassicLvl2  = get("hotClassicLvl2", "0");
+    var hotClassicLvl3  = get("hotClassicLvl3", "0");
+    var hotNFriesOri    = get("hotNFriesOri",   "0");
+    var hotNFriesLvl1   = get("hotNFriesLvl1",  "0");
+    var hotNFriesLvl2   = get("hotNFriesLvl2",  "0");
+    var hotNFriesLvl3   = get("hotNFriesLvl3",  "0");
 
     // Upload bukti transfer ke Google Drive
     var buktiUrl = "";
@@ -56,30 +62,33 @@ function doPost(e) {
       buktiUrl = "Gagal upload: " + fileErr.message;
     }
 
-    // Tulis ke sheet — kolom lama diisi "" agar urutan tidak geser
+    // Paksa kolom Timestamp jadi format teks dulu, biar Sheets gak auto-parse jadi date/number
+    var nextRow = sheet.getLastRow() + 1;
+    sheet.getRange(nextRow, 1).setNumberFormat("@");
+
     sheet.appendRow([
-      timestamp,       // Timestamp
-      nama,            // Nama_Pemesan
-      whatsapp,        // No_Telp
-      hotSlawOri,      // Hot_Slaw_Ori
-      hotSlawLvl1,     // Hot_Slaw_Lvl1
-      hotSlawLvl2,     // Hot_Slaw_Lvl2
-      hotSlawLvl3,     // Hot_Slaw_Lvl3
-      hotClassicOri,   // Hot_Classic_Ori
-      hotClassicLvl1,  // Hot_Classic_Lvl1
-      hotClassicLvl2,  // Hot_Classic_Lvl2
-      hotClassicLvl3,  // Hot_Classic_Lvl3
-      "0",             // HotNFries_Ori     (tidak dipakai, diisi 0)
-      "0",             // HotNFries_Lvl1    (tidak dipakai, diisi 0)
-      "0",             // HotNFries_Lvl2    (tidak dipakai, diisi 0)
-      "0",             // HotNFries_Lvl3    (tidak dipakai, diisi 0)
-      opsiPengiriman,  // Opsi Pengiriman
-      "",              // Additional Sauce  (tidak dipakai)
-      totalPesanan,    // Total_Pesanan
-      alamat,          // Alamat
-      catatan,         // Catatan
-      totalHarga,      // Total_Harga
-      buktiUrl         // Bukti_Transfer
+      timestamp,
+      nama,
+      whatsapp,
+      hotSlawOri,
+      hotSlawLvl1,
+      hotSlawLvl2,
+      hotSlawLvl3,
+      hotClassicOri,
+      hotClassicLvl1,
+      hotClassicLvl2,
+      hotClassicLvl3,
+      hotNFriesOri,
+      hotNFriesLvl1,
+      hotNFriesLvl2,
+      hotNFriesLvl3,
+      opsiPengiriman,
+      sauceQty,
+      totalPesanan,
+      alamat,
+      catatan,
+      totalHarga,
+      buktiUrl
     ]);
 
     return ContentService

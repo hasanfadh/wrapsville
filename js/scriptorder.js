@@ -100,13 +100,15 @@ document.addEventListener("DOMContentLoaded", () => {
             const label = e.target.closest(".delivery-option");
             deliveryFee = parseInt(label.dataset.fee || "0", 10);
 
-            // Alamat hanya bisa diisi kalau pesanan memang diantar.
-            // Ambil Sendiri (atau belum pilih opsi) = kolom alamat terkunci.
+            // Alamat cuma perlu diisi kalau pesanan diantar Ojek Online.
+            // Self Pick Up & Ambil Sendiri (COD) = kolom alamat terkunci.
             const alamatInput = document.getElementById("alamat");
-            if (e.target.value === "Ambil Sendiri") {
+            const noAddressNeeded = e.target.value === "Self Pick Up" || e.target.value === "Ambil Sendiri (COD)";
+
+            if (noAddressNeeded) {
                 alamatInput.value = "";
                 alamatInput.disabled = true;
-                alamatInput.placeholder = "Tidak perlu alamat untuk Ambil Sendiri";
+                alamatInput.placeholder = "Tidak perlu alamat untuk opsi ini";
                 alamatInput.classList.remove("input-error");
             } else {
                 alamatInput.disabled = false;
@@ -178,23 +180,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         totalItemsCount = totalItems;
 
-        // Enable/disable opsi Free Ongkir berdasarkan total item
-        const freeOngkirOption = document.getElementById("freeOngkirOption");
-        const freeOngkirRadio  = freeOngkirOption ? freeOngkirOption.querySelector('input[type="radio"]') : null;
-        if (freeOngkirOption && freeOngkirRadio) {
-            if (totalItems > 6) {
-                freeOngkirOption.classList.remove("disabled");
-                freeOngkirRadio.disabled = false;
-            } else {
-                freeOngkirOption.classList.add("disabled");
-                freeOngkirRadio.disabled = true;
-                if (freeOngkirRadio.checked) {
-                    freeOngkirRadio.checked = false;
-                    deliveryFee = 0;
-                }
-            }
-        }
-
         const totalPrice = menuPrice + deliveryFee + sauceFee;
 
         totalPesananEl.textContent = `${totalItems} pcs`;
@@ -250,7 +235,8 @@ document.addEventListener("DOMContentLoaded", () => {
             additionalSauce:   sauceQty > 0,
             additionalSauceQty: sauceQty,
             total:             totalHargaEl.textContent,
-            menu:              { ...cart }
+            menu:              { ...cart },
+            timestamp:         new Date().toISOString()
         }));
     }
 
@@ -284,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let hasMissing = false;
         requiredInputs.forEach(i => i.classList.remove("input-error"));
         requiredInputs.forEach(i => {
-            if (i.disabled) return; // kolom terkunci (mis. alamat saat Ambil Sendiri) tidak wajib
+            if (i.disabled) return; // kolom terkunci (mis. alamat saat Self Pick Up / Ambil Sendiri) tidak wajib
             const empty = (i.type === "file" && i.files.length === 0) || (i.type !== "file" && i.value.trim() === "");
             if (empty) { hasMissing = true; i.classList.add("input-error"); }
         });
