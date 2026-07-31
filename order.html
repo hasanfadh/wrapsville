@@ -74,6 +74,103 @@
         font-size: 0.84rem;
         color: rgba(255,255,255,0.75);
       }
+
+      /* ===== Modal Konfirmasi Pesanan ===== */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(0,0,0,0.55);
+      }
+
+      .modal-box {
+        background: #fff;
+        border-radius: 16px;
+        max-width: 420px;
+        width: 100%;
+        max-height: 85vh;
+        overflow-y: auto;
+        padding: 22px 20px;
+        color: #333;
+      }
+
+      .modal-box h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #ed0100;
+        margin-bottom: 4px;
+      }
+
+      .modal-subtitle {
+        font-size: 0.85rem;
+        color: #888;
+        margin-bottom: 14px;
+      }
+
+      .modal-summary-block {
+        border-top: 1px solid #f0f0f0;
+        padding: 10px 0;
+      }
+
+      .modal-summary-block:first-of-type {
+        border-top: none;
+      }
+
+      .modal-summary-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 0.88rem;
+        padding: 3px 0;
+      }
+
+      .modal-summary-row span:first-child {
+        color: #777;
+      }
+
+      .modal-summary-row span:last-child {
+        font-weight: 600;
+        text-align: right;
+      }
+
+      .modal-summary-total {
+        font-size: 1rem;
+        margin-top: 4px;
+      }
+
+      .modal-summary-total span {
+        color: #ed0100 !important;
+      }
+
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .modal-actions button {
+        flex: 1;
+        padding: 13px 0;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.92rem;
+        border: none;
+        cursor: pointer;
+      }
+
+      #modalCancelBtn {
+        background: #f2f2f2;
+        color: #555;
+      }
+
+      #modalConfirmBtn {
+        background: #ed0100;
+        color: #fff;
+      }
     </style>
 </head>
 <body>
@@ -316,6 +413,19 @@
     <button type="submit" id="submitButton">Kirim Pesanan</button>
 
   </form>
+
+  <!-- Modal Konfirmasi Pesanan -->
+  <div id="confirmModal" class="modal-overlay">
+    <div class="modal-box">
+      <h3>Konfirmasi Pesanan</h3>
+      <p class="modal-subtitle">Cek lagi ya, Wrapsgang — pastiin semua udah bener sebelum dikirim.</p>
+      <div id="modalSummary"></div>
+      <div class="modal-actions">
+        <button type="button" id="modalCancelBtn">Batal, Cek Lagi</button>
+        <button type="button" id="modalConfirmBtn">Ya, Kirim Pesanan</button>
+      </div>
+    </div>
+  </div>
  </div>
 
  <script src="js/scriptorder.js"></script>

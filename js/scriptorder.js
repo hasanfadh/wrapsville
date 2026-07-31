@@ -1,5 +1,35 @@
 var TOKEN = typeof __APPS_TOKEN__ !== "undefined" ? __APPS_TOKEN__ : "";
 
+// ===== Konfirmasi WhatsApp ke Admin =====
+var ADMIN_WA_NUMBER = "6285726611421";
+var BULAN_ID = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+function formatBatchDate(date) {
+    if (!date || isNaN(date.getTime())) return null;
+    return date.getDate() + " " + BULAN_ID[date.getMonth()];
+}
+
+function buildWaMessage(nama, opsiPengiriman, date, menuLines) {
+    var lines = [];
+    lines.push("Hi minwraps, aku udah order nih🌯");
+    lines.push("");
+    var batchDate = formatBatchDate(date);
+    if (batchDate) lines.push("Batch tanggal " + batchDate + " ya kak");
+    lines.push("");
+    lines.push("Nama: " + (nama || "-"));
+    lines.push("Opsi Pengiriman: " + (opsiPengiriman || "-"));
+    lines.push("");
+    lines.push("List Pesanan:");
+    if (menuLines && menuLines.length > 0) {
+        menuLines.forEach(function(line) { lines.push("- " + line); });
+    } else {
+        lines.push("- (tidak ada data menu)");
+    }
+    lines.push("");
+    lines.push("Thankkuuu 🤍");
+    return lines.join("\n");
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
     // cart: { "hot-classic-ori": 2, "hot-classic-1": 1, ... }
@@ -16,6 +46,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const buktiTransferInput = document.getElementById("buktiTransfer");
     const previewBuktiEl  = document.getElementById("previewBukti");
     const statusMessageEl = document.getElementById("statusMessage");
+
+    const confirmModal      = document.getElementById("confirmModal");
+    const modalSummaryEl    = document.getElementById("modalSummary");
+    const modalCancelBtn    = document.getElementById("modalCancelBtn");
+    const modalConfirmBtn   = document.getElementById("modalConfirmBtn");
 
     const requiredInputs = [
         document.getElementById("nama"),
@@ -144,7 +179,9 @@ document.addEventListener("DOMContentLoaded", () => {
         previewBuktiEl.style.display = "block";
     });
 
-    form.addEventListener("submit", handleSubmit);
+    form.addEventListener("submit", handleFormSubmit);
+    modalCancelBtn.addEventListener("click", hideConfirmModal);
+    modalConfirmBtn.addEventListener("click", handleModalConfirm);
 
     // -------------------------------------------------------
     // updateSummary
@@ -263,10 +300,76 @@ document.addEventListener("DOMContentLoaded", () => {
         return mimes[ext] || "image/jpeg";
     }
 
-    async function handleSubmit(e) {
-        e.preventDefault();
+    // -------------------------------------------------------
+    // Modal konfirmasi
+    // -------------------------------------------------------
+    let pendingWaWindow = null; // tab WA yang dibuka blank saat user klik confirm
 
-        // Validasi input teks
+    function buildMenuListLines() {
+        const lines = [];
+        for (const cartKey in cart) {
+            const qty = cart[cartKey];
+            if (!qty || qty <= 0) continue;
+            const itemId = cartKey.substring(0, cartKey.lastIndexOf("-"));
+            const level  = cartKey.substring(cartKey.lastIndexOf("-") + 1);
+            const menuItemEl = document.querySelector(`.menu-item[data-item-id="${itemId}"]`);
+            const namaMenu = menuItemEl ? menuItemEl.querySelector("h3").textContent : itemId;
+            lines.push(`${namaMenu} – ${levelLabels[level] || level} x${qty}`);
+        }
+        if (sauceQty > 0) lines.push(`Additional Sauce x${sauceQty}`);
+        return lines;
+    }
+
+    function buildModalSummaryHTML() {
+        const rows = buildMenuListLines().map(line => {
+            const [label, qty] = line.split(" x");
+            return `<div class="modal-summary-row"><span>${label}</span><span>${qty} pcs</span></div>`;
+        });
+
+        const selectedDelivery = getSelectedDelivery();
+
+        return `
+            <div class="modal-summary-block">
+                <div class="modal-summary-row"><span>Nama</span><span>${document.getElementById("nama").value}</span></div>
+                <div class="modal-summary-row"><span>WhatsApp</span><span>${document.getElementById("whatsapp").value}</span></div>
+            </div>
+            <div class="modal-summary-block">${rows.join("")}</div>
+            <div class="modal-summary-block">
+                <div class="modal-summary-row"><span>Pengiriman</span><span>${selectedDelivery || "-"}</span></div>
+                <div class="modal-summary-row modal-summary-total"><span>Total</span><span>${totalHargaEl.textContent}</span></div>
+            </div>
+        `;
+    }
+
+    function showConfirmModal() {
+        modalSummaryEl.innerHTML = buildModalSummaryHTML();
+        confirmModal.style.display = "flex";
+    }
+
+    function hideConfirmModal() {
+        confirmModal.style.display = "none";
+    }
+
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        if (!validateForm()) return;
+        showConfirmModal();
+    }
+
+    async function handleModalConfirm() {
+        hideConfirmModal();
+
+        // Buka tab kosong SEKARANG (masih dalam user-gesture klik),
+        // supaya nanti bisa diisi link WA tanpa kena popup blocker.
+        pendingWaWindow = window.open("", "_blank");
+
+        await submitOrder();
+    }
+
+    // -------------------------------------------------------
+    // Validasi (dipisah dari submit, dipanggil sebelum modal muncul)
+    // -------------------------------------------------------
+    function validateForm() {
         let hasMissing = false;
         requiredInputs.forEach(i => i.classList.remove("input-error"));
         requiredInputs.forEach(i => {
@@ -288,8 +391,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (totalItemsCount <= 0) hasMissing = true;
 
         if (hasMissing) {
-            // Kalau ada input teks kosong atau menu kosong, tampilkan statusMessage
-            // Kalau hanya delivery yang kosong, sudah ada inline error + scroll, tidak perlu double pesan
             const onlyDeliveryMissing = !selectedDelivery &&
                 requiredInputs.every(i => i.disabled || (i.type === "file" ? i.files.length > 0 : i.value.trim() !== "")) &&
                 totalItemsCount > 0;
@@ -299,9 +400,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (totalItemsCount <= 0) msg = "Pilih minimal 1 menu dan lengkapi semua data.";
                 showMessage(msg, "error");
             }
-            return;
+            return false;
         }
 
+        return true;
+    }
+
+    // -------------------------------------------------------
+    // Submit beneran (dipanggil setelah user confirm di modal)
+    // -------------------------------------------------------
+    async function submitOrder() {
         prepareHiddenFields();
         setButtonLoading(true);
         statusMessageEl.style.display = "none";
@@ -330,10 +438,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (data.status === "success") {
                 saveOrderToSession();
+
+                // Isi tab WA yang sudah dibuka blank tadi, lalu redirect ke success.html
+                const waMsg = buildWaMessage(
+                    document.getElementById("nama").value,
+                    getSelectedDelivery(),
+                    new Date(),
+                    buildMenuListLines()
+                );
+                const waLink = `https://wa.me/${ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
+
+                if (pendingWaWindow) {
+                    pendingWaWindow.location.href = waLink;
+                } else {
+                    // Fallback kalau popup ke-blokir browser
+                    window.open(waLink, "_blank");
+                }
+
                 window.location.href = "success.html";
             } else if (data.status === "closed") {
+                if (pendingWaWindow) pendingWaWindow.close();
                 window.location.href = "closed.html";
             } else if (data.status === "over_limit") {
+                if (pendingWaWindow) pendingWaWindow.close();
                 showMessage("" + data.message, "error");
                 setButtonLoading(false);
             } else {
@@ -342,6 +469,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (err) {
             console.error("Submit error:", err);
+            if (pendingWaWindow) pendingWaWindow.close();
             showMessage("Gagal mengirim. Coba lagi atau hubungi kami via WhatsApp.", "error");
             setButtonLoading(false);
         }

@@ -147,27 +147,6 @@
       background-color: #c00;
       color: #fff;
     }
-
-    .btn-confirm-admin {
-      display: inline-block;
-      padding: 14px 36px;
-      background-color: #25D366;
-      color: #fff;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 1rem;
-      border-radius: 10px;
-      transition: background-color 0.2s;
-    }
-
-    .btn-confirm-admin:hover {
-      background-color: #1ebe57;
-    }
-
-    .btn-confirm-admin.disabled {
-      background-color: #ccc;
-      pointer-events: none;
-    }
   </style>
 </head>
 <body>
@@ -252,9 +231,6 @@
       </p>
 
       <div class="success-actions">
-        <a href="#" id="btnConfirmAdmin" class="btn-confirm-admin" target="_blank" rel="noopener">
-          Konfirmasi Pesanan ke Admin
-        </a>
         <a href="index.html" class="btn-home">Kembali ke Beranda</a>
       </div>
 
@@ -336,45 +312,12 @@
         }).join('');
       }
 
-      // ===== Bangun pesan WhatsApp otomatis buat admin =====
-      const adminWaNumber = '6285726611421';
-
-      const bulanID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-
-      function formatBatchDate(isoString) {
-        if (!isoString) return null;
-        const d = new Date(isoString);
-        if (isNaN(d.getTime())) return null;
-        return `${d.getDate()} ${bulanID[d.getMonth()]}`;
-      }
-
-      function buildWaMessage(o) {
-        const lines = [];
-        lines.push('Hi minwraps, aku udah order nih🌯');
-        lines.push('');
-        const batchDate = formatBatchDate(o.timestamp);
-        if (batchDate) lines.push(`Batch tanggal ${batchDate} ya kak`);
-        lines.push(`Atas nama: ${o.nama || '-'}`);
-        lines.push(`Untuk opsi pengiriman: ${o.opsiPengiriman || '-'}`);
-        lines.push('');
-        lines.push('Thankkuuu 🤍');
-        return lines.join('\n');
-      }
-
-      const waMsg = buildWaMessage(order);
-      const waBtn = document.getElementById('btnConfirmAdmin');
-      if (waBtn) {
-        waBtn.href = `https://wa.me/${adminWaNumber}?text=${encodeURIComponent(waMsg)}`;
-      }
-
       // Hapus data dari session supaya tidak muncul lagi kalau di-refresh
       sessionStorage.removeItem('wrapsvilleOrder');
 
     } else {
       // Tidak ada data — mungkin akses langsung ke halaman ini
       document.getElementById('sumNama').textContent = 'Data tidak tersedia';
-      const waBtn = document.getElementById('btnConfirmAdmin');
-      if (waBtn) waBtn.classList.add('disabled');
     }
   </script>
 
