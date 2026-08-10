@@ -7,6 +7,54 @@
   <meta name="description" content="Wrapsville, Nashville chicken wraps dengan level pedas sesuai selera. Wrap ur hunger, burn ur taste.">
   <link rel="icon" type="image/png" href="images/logowrapsville.png">
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ==== Menu card: price badge + star rating (tambahan) ==== */
+    .menu-card-img {
+      position: relative;
+    }
+    .menu-card-price {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #e2401c;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      z-index: 2;
+      letter-spacing: 0.02em;
+    }
+    .menu-card-rating {
+      position: relative;
+      display: inline-block;
+      font-size: 1rem;
+      line-height: 1;
+      letter-spacing: 2px;
+      margin: 6px 0 4px;
+    }
+    .menu-card-rating .stars-bg,
+    .menu-card-rating .stars-fill {
+      display: block;
+      white-space: nowrap;
+    }
+    .menu-card-rating .stars-bg {
+      color: rgba(255,255,255,0.25);
+    }
+    .menu-card-rating .stars-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      color: #ffc107;
+      width: var(--rating-pct, 0%);
+    }
+  </style>
 </head>
 <body>
 
@@ -83,20 +131,41 @@
 
     <div class="menu-grid">
       <a href="order.html" class="menu-card">
-        <div class="menu-card-img"><img src="images/hc.png" alt="Hot Classic" loading="lazy"></div>
+        <div class="menu-card-img">
+          <img src="images/hc.png" alt="Hot Classic" loading="lazy">
+          <span class="menu-card-price">30K</span>
+        </div>
         <h3>Hot Classic</h3>
+        <div class="menu-card-rating" style="--rating-pct: 66.6%;" aria-label="Rating 2 dari 3 bintang">
+          <span class="stars-bg">★★★</span>
+          <span class="stars-fill">★★★</span>
+        </div>
         <p>Nashville chicken + signature sauce. Simpel, juicy, nggak pernah salah.</p>
         <span class="menu-card-link">Order →</span>
       </a>
       <a href="order.html" class="menu-card">
-        <div class="menu-card-img"><img src="images/hs.png" alt="Hot Slaw" loading="lazy"></div>
+        <div class="menu-card-img">
+          <img src="images/hs.png" alt="Hot Slaw" loading="lazy">
+          <span class="menu-card-price">25K</span>
+        </div>
         <h3>Hot Slaw</h3>
+        <div class="menu-card-rating" style="--rating-pct: 83.3%;" aria-label="Rating 2.5 dari 3 bintang">
+          <span class="stars-bg">★★★</span>
+          <span class="stars-fill">★★★</span>
+        </div>
         <p>Crispy chicken plus fresh slaw yang seger, pedas ketemu crunchy.</p>
         <span class="menu-card-link">Order →</span>
       </a>
       <a href="order.html" class="menu-card">
-        <div class="menu-card-img"><img src="images/hnf.png" alt="Hot N Fries" loading="lazy"></div>
+        <div class="menu-card-img">
+          <img src="images/hnf.png" alt="Hot N Fries" loading="lazy">
+          <span class="menu-card-price">30K</span>
+        </div>
         <h3>Hot N Fries</h3>
+        <div class="menu-card-rating" style="--rating-pct: 100%;" aria-label="Rating 3 dari 3 bintang">
+          <span class="stars-bg">★★★</span>
+          <span class="stars-fill">★★★</span>
+        </div>
         <p>Chicken, fries, dan saus dalam satu wrap. Combo paling nagih.</p>
         <span class="menu-card-link">Order →</span>
       </a>

@@ -9,6 +9,13 @@ function formatBatchDate(date) {
     return date.getDate() + " " + BULAN_ID[date.getMonth()];
 }
 
+// PO ini H+1 — batch selalu besok dari tanggal order dibuat.
+function getBatchDate() {
+    var d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d;
+}
+
 function buildWaMessage(nama, opsiPengiriman, date, menuLines) {
     var lines = [];
     lines.push("Hi minwraps, aku udah order nih🌯");
@@ -21,9 +28,9 @@ function buildWaMessage(nama, opsiPengiriman, date, menuLines) {
     lines.push("");
     lines.push("List Pesanan:");
     if (menuLines && menuLines.length > 0) {
-        menuLines.forEach(function(line) { lines.push("- " + line); });
+        menuLines.forEach(function(item) { lines.push("• " + item.label + " : " + item.qty + " Pcs"); });
     } else {
-        lines.push("- (tidak ada data menu)");
+        lines.push("• (tidak ada data menu)");
     }
     lines.push("");
     lines.push("Thankkuuu 🤍");
@@ -314,17 +321,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const level  = cartKey.substring(cartKey.lastIndexOf("-") + 1);
             const menuItemEl = document.querySelector(`.menu-item[data-item-id="${itemId}"]`);
             const namaMenu = menuItemEl ? menuItemEl.querySelector("h3").textContent : itemId;
-            lines.push(`${namaMenu} – ${levelLabels[level] || level} x${qty}`);
+            lines.push({ label: `${namaMenu} – ${levelLabels[level] || level}`, qty });
         }
-        if (sauceQty > 0) lines.push(`Additional Sauce x${sauceQty}`);
+        if (sauceQty > 0) lines.push({ label: "Additional Sauce", qty: sauceQty });
         return lines;
     }
 
     function buildModalSummaryHTML() {
-        const rows = buildMenuListLines().map(line => {
-            const [label, qty] = line.split(" x");
-            return `<div class="modal-summary-row"><span>${label}</span><span>${qty} pcs</span></div>`;
-        });
+        const rows = buildMenuListLines().map(({ label, qty }) =>
+            `<div class="modal-summary-row"><span>${label}</span><span>${qty} pcs</span></div>`
+        );
 
         const selectedDelivery = getSelectedDelivery();
 
@@ -440,22 +446,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 saveOrderToSession();
 
                 // Isi tab WA yang sudah dibuka blank tadi, lalu redirect ke success.html
+                // Batch date = H+1 (besok), bukan tanggal order dibuat.
                 const waMsg = buildWaMessage(
                     document.getElementById("nama").value,
                     getSelectedDelivery(),
-                    new Date(),
+                    getBatchDate(),
                     buildMenuListLines()
                 );
                 const waLink = `https://wa.me/${ADMIN_WA_NUMBER}?text=${encodeURIComponent(waMsg)}`;
 
-                if (pendingWaWindow) {
-                    pendingWaWindow.location.href = waLink;
+                if (pendingWaWindow && !pendingWaWindow.closed) {
+                    try {
+                        pendingWaWindow.location.replace(waLink);
+                    } catch (navErr) {
+                        pendingWaWindow.location.href = waLink;
+                    }
                 } else {
                     // Fallback kalau popup ke-blokir browser
                     window.open(waLink, "_blank");
                 }
 
-                window.location.href = "success.html";
+                // Kasih jeda sedikit supaya browser sempat memproses
+                // navigasi tab WA sebelum tab utama ikut berpindah halaman.
+                setTimeout(() => {
+                    window.location.href = "success.html";
+                }, 250);
             } else if (data.status === "closed") {
                 if (pendingWaWindow) pendingWaWindow.close();
                 window.location.href = "closed.html";
