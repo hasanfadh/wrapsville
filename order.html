@@ -75,6 +75,19 @@
         color: rgba(255,255,255,0.75);
       }
 
+      /* ===== Notice status stok (tidak memblokir pemesanan) ===== */
+      .ws-notice {
+        display: none;
+        margin: 0 0 18px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: #fff8e1;
+        border: 1px solid #ffe08a;
+        color: #7a5900;
+        font-size: 0.86rem;
+        line-height: 1.55;
+      }
+
       /* ===== Modal Konfirmasi Pesanan ===== */
       .modal-overlay {
         position: fixed;
@@ -191,6 +204,9 @@
     <p class="ws-load-text">Mengecek ketersediaan stok<span class="ws-load-dots"><span>.</span><span>.</span><span>.</span></span></p>
     <p class="ws-load-sub">Sebentar ya, Wrapsgang! 🌯</p>
   </div>
+
+  <!-- Status stok: hanya pemberitahuan, tidak menghalangi pemesanan -->
+  <div id="stockNotice" class="ws-notice" role="status"></div>
 
   <form id="orderForm"
     action="https://script.google.com/macros/s/AKfycbz7PkmpAEFu0O2DSkDUpQ5UqH5Ax2Vc9J_DjUWtIGrgOlLIOPsBSfDt1AOe2EqD3EMt/exec">
@@ -431,74 +447,129 @@
  <script src="js/scriptorder.js"></script>
 
   <script>
-    (function() {
+    (function () {
       var APPS_SCRIPT_URL = document.getElementById("orderForm").action;
 
+      // Apps Script sering butuh 3-8 detik (lebih lama lagi kalau cold start),
+      // jadi timeout 8 detik dulu terlalu pendek dan sering bikin false "tutup".
+      var STOCK_TIMEOUT_MS   = 15000;
+      var STOCK_MAX_ATTEMPTS = 3;
+      var STOCK_POLL_MS      = 60000;
 
-      // isInitial: true = cek pertama saat load, false = cek periodik (silent)
+      var cbSeq = 0;
+      var pollTimer = null;
+
+      function hideOverlay() {
+        var overlay = document.getElementById("stockCheckOverlay");
+        if (overlay) overlay.style.display = "none";
+      }
+
+      function showNotice(text) {
+        var el = document.getElementById("stockNotice");
+        if (!el) return;
+        el.textContent = text;
+        el.style.display = "block";
+      }
+
+      // Dipakai supaya cek berkala tidak membuang isian yang sudah diketik user.
+      function formHasUserData() {
+        var nama = document.getElementById("nama");
+        var wa   = document.getElementById("whatsapp");
+        if (nama && nama.value.trim() !== "") return true;
+        if (wa && wa.value.trim() !== "") return true;
+        return document.querySelectorAll(".level-rows .level-row").length > 0;
+      }
+
+      function goClosed() {
+        if (pollTimer) clearInterval(pollTimer);
+        window.location.href = "closed.html";
+      }
+
+      // isInitial: true = cek saat halaman dibuka (overlay tampil),
+      //            false = cek berkala di latar belakang.
       function checkStock(isInitial) {
-        var old = document.getElementById("jsonp-stock");
-        if (old) old.remove();
-
         var token = (typeof TOKEN !== "undefined") ? TOKEN : "";
-        var retryCount = 0;
+        var attemptNo = 0;
 
         function attempt() {
-          var callbackName = "wsStockCallback_" + Date.now();
-          var timeoutId;
+          attemptNo++;
 
-          window[callbackName] = function(data) {
-            clearTimeout(timeoutId);
-            var overlay = document.getElementById("stockCheckOverlay");
-            if (overlay) overlay.style.display = "none";
-            if (data.status === "closed" || data.status === "error") {
-              window.location.href = "closed.html";
-            }
-            delete window[callbackName];
-          };
-
-          timeoutId = setTimeout(function() {
-            if (!window[callbackName]) return;
-            delete window[callbackName];
-            retryCount++;
-            if (retryCount < 3) {
-              attempt();
-            } else if (isInitial) {
-              // Setelah 3x gagal, tampilkan pesan error + tombol retry
-              // Jangan redirect ke closed — bisa jadi cuma masalah koneksi
-              window.location.href = "closed.html";
-            }
-          }, 8000);
-
+          var callbackName = "wsStockCallback_" + Date.now() + "_" + (++cbSeq);
+          var settled = false;
+          var timeoutId = null;
           var script = document.createElement("script");
-          script.id  = "jsonp-stock";
-          script.src = APPS_SCRIPT_URL + "?token=" + encodeURIComponent(token) + "&callback=" + callbackName;
-          script.onerror = function() {
-            clearTimeout(timeoutId);
-            if (!window[callbackName]) return;
-            delete window[callbackName];
-            retryCount++;
-            if (retryCount < 3) {
-              attempt();
-            } else if (isInitial) {
-              window.location.href = "closed.html";
+
+          function cleanup() {
+            if (timeoutId) clearTimeout(timeoutId);
+            try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
+            if (script && script.parentNode) script.parentNode.removeChild(script);
+          }
+
+          function fail() {
+            if (settled) return;
+            settled = true;
+            cleanup();
+
+            if (attemptNo < STOCK_MAX_ATTEMPTS) { attempt(); return; }
+
+            // Semua percobaan gagal. Ini TIDAK berarti stok habis - bisa jadi
+            // koneksi lambat, Apps Script lemot, atau token salah.
+            // Biarkan user tetap memesan; stok tetap divalidasi server saat submit.
+            if (isInitial) {
+              hideOverlay();
+              showNotice("Status stok belum bisa kami pastikan (koneksi atau server sedang lambat). Kamu tetap bisa lanjut memesan - ketersediaan akan dicek ulang saat pesanan dikirim.");
+            }
+          }
+
+          window[callbackName] = function (data) {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            if (isInitial) hideOverlay();
+
+            if (data && data.status === "closed") {
+              // Hanya status "closed" yang eksplisit yang boleh menutup halaman.
+              if (isInitial || !formHasUserData()) {
+                goClosed();
+              } else {
+                // User sudah mengisi form - jangan buang isiannya.
+                if (pollTimer) clearInterval(pollTimer);
+                showNotice("PO baru saja ditutup oleh admin. Silakan konfirmasi ke admin lewat WhatsApp sebelum mengirim pesanan.");
+              }
+            } else if (data && data.status === "error") {
+              // Error server (mis. token salah / kuota Apps Script) BUKAN berarti tutup.
+              if (isInitial) {
+                showNotice("Status stok tidak bisa dipastikan: " + (data.message || "error") + ". Kamu tetap bisa lanjut memesan.");
+              }
             }
           };
+
+          timeoutId = setTimeout(fail, STOCK_TIMEOUT_MS);
+
+          // Kalau server balas JSON mentah (bukan JSONP), script tetap "load"
+          // tapi callback tidak pernah jalan - deteksi di sini biar tidak
+          // perlu menunggu timeout penuh.
+          script.onload = function () {
+            setTimeout(function () { if (!settled) fail(); }, 0);
+          };
+          script.onerror = fail;
+
+          script.src = APPS_SCRIPT_URL + "?token=" + encodeURIComponent(token) +
+                       "&callback=" + callbackName + "&_=" + Date.now();
           document.body.appendChild(script);
         }
 
         attempt();
       }
 
-      window.addEventListener("load", function() {
-        // ?dev di URL = skip stock check, langsung tutup overlay
+      window.addEventListener("load", function () {
+        // ?dev di URL = lewati cek stok, langsung tutup overlay
         if (new URLSearchParams(window.location.search).has("dev")) {
-          var overlay = document.getElementById("stockCheckOverlay");
-          if (overlay) overlay.style.display = "none";
+          hideOverlay();
           return;
         }
         checkStock(true);
-        setInterval(function() { checkStock(false); }, 30000);
+        pollTimer = setInterval(function () { checkStock(false); }, STOCK_POLL_MS);
       });
     })();
   </script>
